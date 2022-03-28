@@ -1,0 +1,39 @@
+---
+title: "index"
+author: "Chris Hess"
+date: "3/28/2022"
+output: html_document
+---
+
+```{r setup, include=TRUE, message=FALSE, warning=FALSE}
+#main packages for today
+library(tidyverse)
+library(sf)
+
+#supporting cast
+library(broom)
+library(ggeffects)
+library(biscale)
+```
+
+
+### goals of visualization
+
+- show distribution
+- compare groups
+- illustrate associations
+
+
+### principles of effective visualizations
+
+- hits you in a pre-frontal sort of way 
+- does not use more ink or complexity than is required to ensure correct inference
+- has enough labeling to understand w/o context 
+
+
+### types of visualizations
+
+- ggplot + sf accomplishes 95% of what you will want, especially with extensions
+- the defaults are sensible, you can fiddle with everything and the grammar of graphics is best api
+- base is good if you want to be extra fiddly rather than just fiddly
+- I wouldn't invest time in learning lattice or grid unless you want to understand the building blocks of ggplot for building your own extensions to it
