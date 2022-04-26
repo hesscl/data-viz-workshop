@@ -270,7 +270,7 @@ $(document).ready(function () {
       <a href="case-b-event-study.html">Case B: Event Studies</a>
     </li>
     <li>
-      <a href="case-c-spatial-clustering.html">Case C: Spatial Clustering</a>
+      <a href="case-c-spatial-distribution.html">Case C: Spatial Distribution</a>
     </li>
     <li>
       <a href="case-d-multiple-contrasts.html">Case D: Multiple Contrasts</a>
@@ -315,8 +315,8 @@ $(document).ready(function () {
 <p>Propensity score matching (PSM) is the classical matching method for causal inference with observational data, predicated on the idea that we can approximate experimental conditions by matching treated cases (i.e. who did in fact receive a treatment of some form) to one or more control cases based on some set of pre-treatment covariates relevant to selection into the treatment. While the classical method still is frequently used, there are currently many different matching algorithms that can be used in place for identifying suitable control cases to match to treated ones.</p>
 <p>Similarly, there are related classes of methods based on weighting and subclassification that aim to recompose an observed population such that the treated and control groups have like characteristics on observed characteristics relevant to a given treatment. These methods differ in some important ways from matching methods (e.g., in their potential use of the entirety of the starting observational data), but their end game is similar: construct the weighted data such that the treated and control groups are similar on pre-treatment values, then assess how post-treatment values differ. As such, we will refer to matching methods as encompassing these other related approaches to adjusting observational data for causal inference.</p>
 <p><br></p>
-<div id="motivation-why-does-balance-matter" class="section level3">
-<h3>Motivation: why does balance matter?</h3>
+<div id="motivation-why-does-balance-matter-and-how-can-we-convey-it" class="section level3">
+<h3>Motivation: why does balance matter and how can we convey it?</h3>
 <p>For many years now, folks have used these methods to study effects of different treatments using observational data. This is because they <em>can</em> offer desirable properties (read: they don’t necessarily <em>have</em> to though).</p>
 <p><a href="https://dx.doi.org/10.1214%2F09-STS313">Stuart (2010)</a> says the following on this matter (emphasis added):</p>
 <blockquote>
@@ -598,7 +598,6 @@ ggplot(balance_stats, aes(x = abs(smd), y = fct_reorder(label, abs(smd)),
 <div id="our-final-cosmetic-adjustments" class="section level2">
 <h2>Our final cosmetic adjustments</h2>
 <p>For the last bit of ggploting for this case study, we will make some minor adjustments aimed at increasing the interpretability of the plot in ways beyond its organization.</p>
-<p>If plot organization is the workhorse kosher salt of data visualization (work with me here), but these final tweaks are the, um, often important finishing salt of graphical displays (nailed it).</p>
 <p>Here the main adjustments are to:</p>
 <ol style="list-style-type: decimal">
 <li>increase the point geometry size</li>

@@ -270,7 +270,7 @@ $(document).ready(function () {
       <a href="case-b-event-study.html">Case B: Event Studies</a>
     </li>
     <li>
-      <a href="case-c-spatial-clustering.html">Case C: Spatial Clustering</a>
+      <a href="case-c-spatial-distribution.html">Case C: Spatial Distribution</a>
     </li>
     <li>
       <a href="case-d-multiple-contrasts.html">Case D: Multiple Contrasts</a>
@@ -316,11 +316,24 @@ $(document).ready(function () {
 <div id="requirements" class="section level2">
 <h2>Requirements</h2>
 <p>If you want to follow along on your own computer, you’ll need to have a recent version of R installed along with the a few accompanying software libraries that we’ll use to jump start these vignettes.</p>
-<p>First and foremost of these libraries is the <code>tidyverse</code> meta-library which contains <code>ggplot2</code> and other useful libraries like <code>dplyr</code> that will be referenced within the workshop material. We will also use <code>cobalt</code> within Case A about covariate balance, <code>fixest</code> within Case B about design-based methods and <code>sf</code> within Case C about spatial clustering.</p>
-<pre class="r"><code>library(tidyverse)
+<p>First and foremost of these libraries is the <code>tidyverse</code> meta-library which contains <code>ggplot2</code> and other useful libraries like <code>dplyr</code> that will be referenced within the workshop material. We will also use libraries like <code>cobalt</code> within Case A about covariate balance, <code>fixest</code> within Case B about design-based methods and <code>sf</code> within Case C about spatial clustering.</p>
+<pre class="r"><code>#all cases
+library(tidyverse)
+
+#case a
 library(cobalt)
+
+#case b
 library(fixest)
-library(sf)</code></pre>
+library(did)
+
+#case c
+library(sf)
+library(tigris)
+library(ggspatial)
+library(biscale)
+library(cowplot)
+library(ggpattern)</code></pre>
 <p><br></p>
 <p>To get started in an RStudio session, clone the GitHub repository (which includes all of the necessary data) and follow along with the .Rmd files that correspond to the different vignettes.</p>
 <p><br></p>
@@ -343,34 +356,41 @@ library(sf)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] sf_1.0-7        fixest_0.10.4   cobalt_4.3.2    forcats_0.5.1  
-##  [5] stringr_1.4.0   dplyr_1.0.8     purrr_0.3.4     readr_2.1.2    
-##  [9] tidyr_1.2.0     tibble_3.1.6    ggplot2_3.3.5   tidyverse_1.3.1
+##  [1] ggpattern_0.4.2 cowplot_1.1.1   biscale_0.2.0   ggspatial_1.1.5
+##  [5] tigris_1.6      sf_1.0-7        did_2.1.1       fixest_0.10.4  
+##  [9] cobalt_4.3.2    forcats_0.5.1   stringr_1.4.0   dplyr_1.0.8    
+## [13] purrr_0.3.4     readr_2.1.2     tidyr_1.2.0     tibble_3.1.6   
+## [17] ggplot2_3.3.5   tidyverse_1.3.1
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.8.3        lubridate_1.8.0     lattice_0.20-45    
-##  [4] class_7.3-20        zoo_1.8-10          assertthat_0.2.1   
-##  [7] digest_0.6.29       utf8_1.2.2          R6_2.5.1           
-## [10] cellranger_1.1.0    backports_1.4.1     reprex_2.0.1       
-## [13] e1071_1.7-9         evaluate_0.15       httr_1.4.2         
-## [16] pillar_1.7.0        rlang_1.0.2         readxl_1.4.0       
-## [19] rstudioapi_0.13     jquerylib_0.1.4     rmarkdown_2.13     
-## [22] munsell_0.5.0       proxy_0.4-26        broom_0.7.12       
-## [25] compiler_4.1.3      numDeriv_2016.8-1.1 modelr_0.1.8       
-## [28] xfun_0.30           pkgconfig_2.0.3     htmltools_0.5.2    
-## [31] tidyselect_1.1.2    fansi_1.0.3         crayon_1.5.1       
-## [34] tzdb_0.3.0          dbplyr_2.1.1        withr_2.5.0        
-## [37] grid_4.1.3          nlme_3.1-157        jsonlite_1.8.0     
-## [40] gtable_0.3.0        lifecycle_1.0.1     DBI_1.1.2          
-## [43] magrittr_2.0.3      units_0.8-0         scales_1.1.1       
-## [46] KernSmooth_2.23-20  cli_3.2.0           stringi_1.7.6      
-## [49] dreamerr_1.2.3      fs_1.5.2            xml2_1.3.3         
-## [52] bslib_0.3.1         ellipsis_0.3.2      generics_0.1.2     
-## [55] vctrs_0.4.0         sandwich_3.0-1      Formula_1.2-4      
-## [58] tools_4.1.3         glue_1.6.2          hms_1.1.1          
-## [61] fastmap_1.1.0       yaml_2.3.5          colorspace_2.0-3   
-## [64] classInt_0.4-3      rvest_1.0.2         knitr_1.38         
-## [67] haven_2.4.3         sass_0.4.1</code></pre>
+##  [1] nlme_3.1-157        fs_1.5.2            lubridate_1.8.0    
+##  [4] httr_1.4.2          dreamerr_1.2.3      numDeriv_2016.8-1.1
+##  [7] tools_4.1.3         BMisc_1.4.4         backports_1.4.1    
+## [10] bslib_0.3.1         rgdal_1.5-29        utf8_1.2.2         
+## [13] R6_2.5.1            KernSmooth_2.23-20  DBI_1.1.2          
+## [16] colorspace_2.0-3    withr_2.5.0         sp_1.4-6           
+## [19] tidyselect_1.1.2    compiler_4.1.3      cli_3.2.0          
+## [22] rvest_1.0.2         xml2_1.3.3          sandwich_3.0-1     
+## [25] sass_0.4.1          scales_1.1.1        classInt_0.4-3     
+## [28] proxy_0.4-26        rappdirs_0.3.3      digest_0.6.29      
+## [31] foreign_0.8-82      rmarkdown_2.13      pkgconfig_2.0.3    
+## [34] htmltools_0.5.2     dbplyr_2.1.1        fastmap_1.1.0      
+## [37] rlang_1.0.2         readxl_1.4.0        rstudioapi_0.13    
+## [40] jquerylib_0.1.4     generics_0.1.2      zoo_1.8-10         
+## [43] jsonlite_1.8.0      car_3.0-12          magrittr_2.0.3     
+## [46] Formula_1.2-4       Rcpp_1.0.8.3        munsell_0.5.0      
+## [49] fansi_1.0.3         abind_1.4-5         lifecycle_1.0.1    
+## [52] stringi_1.7.6       yaml_2.3.5          carData_3.0-5      
+## [55] grid_4.1.3          maptools_1.1-3      crayon_1.5.1       
+## [58] lattice_0.20-45     haven_2.4.3         hms_1.1.1          
+## [61] knitr_1.38          pillar_1.7.0        uuid_1.0-4         
+## [64] ggpubr_0.4.0        ggsignif_0.6.3      reprex_2.0.1       
+## [67] glue_1.6.2          evaluate_0.15       data.table_1.14.2  
+## [70] modelr_0.1.8        vctrs_0.4.0         tzdb_0.3.0         
+## [73] cellranger_1.1.0    gtable_0.3.0        assertthat_0.2.1   
+## [76] xfun_0.30           broom_0.7.12        e1071_1.7-9        
+## [79] rstatix_0.7.0       class_7.3-20        units_0.8-0        
+## [82] ellipsis_0.3.2</code></pre>
 </div>
 
 

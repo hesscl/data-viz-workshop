@@ -270,7 +270,7 @@ $(document).ready(function () {
       <a href="case-b-event-study.html">Case B: Event Studies</a>
     </li>
     <li>
-      <a href="case-c-spatial-clustering.html">Case C: Spatial Clustering</a>
+      <a href="case-c-spatial-distribution.html">Case C: Spatial Distribution</a>
     </li>
     <li>
       <a href="case-d-multiple-contrasts.html">Case D: Multiple Contrasts</a>
@@ -345,9 +345,9 @@ $(document).ready(function () {
 library(did)         #for event study models</code></pre>
 <p><br></p>
 </div>
-<div id="data" class="section level3">
-<h3>Data</h3>
 </div>
+<div id="data" class="section level2">
+<h2>Data</h2>
 <div id="fake-two-period-dd-data" class="section level3">
 <h3>Fake two-period DD data</h3>
 <pre class="r"><code>#first let&#39;s simulate some simple two period DD data to model
@@ -428,13 +428,13 @@ dd_2_period &lt;- sim_2_period %&gt;%
   mutate(cf = ifelse(period == 1, mean_Y, mean_Y[period == 1] + chg[treat == 0]))
 
 ggplot(dd_2_period, aes(x = period, y = mean_Y, shape = factor(treat), 
-                        group = treat, linetype = &quot;observed&quot;)) +
+                        group = treat, linetype = &quot;Observed&quot;)) +
   geom_line() +
-  geom_line(aes(x = period, y = cf, linetype = &quot;counterfactual&quot;)) +
-  geom_point(aes(x = period, y = cf), size = 3) +
+  geom_line(aes(x = period, y = cf, linetype = &quot;Counterfactual&quot;)) +
+  geom_point(aes(x = period, y = cf), size = 2.5) +
   geom_point(size = 3) +
   scale_x_continuous(breaks = c(1, 2), labels = c(&quot;Pre-treatment&quot;, &quot;Post-treatment&quot;)) +
-  scale_shape_discrete(labels = c(&quot;control&quot;, &quot;treated&quot;)) +
+  scale_shape_discrete(labels = c(&quot;Control&quot;, &quot;Treated&quot;)) +
   scale_linetype_manual(values = c(2, 1)) +
   labs(x = &quot;&quot;, y = &quot;Average Y\n&quot;, shape = &quot;&quot;, linetype = &quot;&quot;) +
   theme_bw() +
@@ -457,21 +457,45 @@ ggplot(dd_2_period, aes(x = period, y = mean_Y, shape = factor(treat),
 <pre class="r"><code>ggplot(means, aes(x = year, y = lemp, group = treat, shape = factor(treat))) +
   geom_vline(xintercept = 2006) +
   geom_line() +
-  geom_point() +
-  theme_bw()</code></pre>
+  geom_point(size = 2.5) +
+  scale_shape_discrete(labels = c(&quot;Control&quot;, &quot;Treated&quot;)) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;, 
+        panel.grid.minor = element_blank()) +
+  labs(x = &quot;&quot;, y = &quot;Logged Teen Employment\n&quot;, shape = &quot;&quot;)</code></pre>
 <p><img src="case-b-event-study_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><br></p>
+<p>In contrast, with treatment timing we have to retool things a bit. The result is not quite as simple since the small multiples are needed, but by overlaying the control group in each panel it is easier to make the implied comparison than if we had a separate panel for those cases.</p>
 <pre class="r"><code>means &lt;- mpdta %&gt;%
-  mutate(first.treat = ifelse(first.treat == 0, NA, first.treat)) %&gt;%
   group_by(year, first.treat, treat) %&gt;%
-  summarize(lemp = mean(lemp))</code></pre>
+  summarize(lemp = mean(lemp)) %&gt;%
+  ungroup() %&gt;%
+  mutate(first.treat = ifelse(first.treat == 0, NA, first.treat)) %&gt;%
+  rowwise() %&gt;%
+  mutate(first.treat.chr = case_when(
+           is.na(first.treat) ~ list(c(2004, 2006, 2007)), 
+           TRUE ~ list(unique(first.treat)))) %&gt;%
+  ungroup() %&gt;%
+  unnest(first.treat.chr)</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;year&#39;, &#39;first.treat&#39;. You can override
 ## using the `.groups` argument.</code></pre>
-<pre class="r"><code>ggplot(means, aes(x = year, y = lemp, color = factor(first.treat), group = factor(first.treat))) +
-  facet_grid(~ first.treat) +
+<pre class="r"><code>ggplot(means, aes(x = year, y = lemp, 
+                  shape = factor(first.treat), linetype = is.na(first.treat),
+                  group = factor(first.treat))) +
+  facet_wrap(~ paste(&quot;First Treated:&quot;, first.treat.chr)) +
   geom_vline(aes(xintercept = first.treat)) +
   geom_line() +
-  geom_point()</code></pre>
-<pre><code>## Warning: Removed 5 rows containing missing values (geom_vline).</code></pre>
+  geom_point() +
+  geom_point() +
+  scale_linetype_discrete(labels = c(&quot;Treated&quot;, &quot;Control&quot;)) +
+  scale_shape_discrete(na.value = 4, labels = c(&quot;2004&quot;, &quot;2006&quot;, &quot;2007&quot;, &quot;Control&quot;)) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;,
+        panel.spacing = unit(.2, &quot;in&quot;),
+        panel.grid.minor = element_blank()) +
+  labs(x = &quot;&quot;, y = &quot;Logged Teen Employment\n&quot;, linetype = &quot;Treatment Group&quot;) +
+  guides(shape = &quot;none&quot;)</code></pre>
+<pre><code>## Warning: Removed 15 rows containing missing values (geom_vline).</code></pre>
 <p><img src="case-b-event-study_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p><br></p>
 </div>
@@ -525,15 +549,11 @@ summary(mw.attgt) </code></pre>
 ## P-value for pre-test of parallel trends assumption:  0.16812
 ## Control Group:  Never Treated,  Anticipation Periods:  0
 ## Estimation Method:  Doubly Robust</code></pre>
-<pre class="r"><code>mw.attgt %&gt;% ls</code></pre>
-<pre><code>##  [1] &quot;aggte&quot;        &quot;alp&quot;          &quot;att&quot;          &quot;c&quot;            &quot;DIDparams&quot;   
-##  [6] &quot;group&quot;        &quot;inffunc&quot;      &quot;n&quot;            &quot;se&quot;           &quot;t&quot;           
-## [11] &quot;V_analytical&quot; &quot;W&quot;            &quot;Wpval&quot;</code></pre>
 <p><br></p>
 <p>There is a default plot method for the <code>did</code> package that enables you to avoid making the plot for yourself.</p>
 <pre class="r"><code># plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.attgt, ylim = c(-.3,.3), type = &quot;calendar&quot;)</code></pre>
+ggdid(mw.attgt, ylim = c(-.3, .3), type = &quot;calendar&quot;)</code></pre>
 <p><img src="case-b-event-study_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p><br></p>
 </div>
@@ -551,7 +571,7 @@ ggdid(mw.attgt, ylim = c(-.3,.3), type = &quot;calendar&quot;)</code></pre>
 <p>Thankfully, you can also pass <code>theming = FALSE</code> to <code>ggdid()</code> to have it produce an ATT plot but let you handle the theming yourself. There does not seem to be an easy way to manipulate the aesthetics of this plot (e.g., add a shape aesthetic for pre/post), unfortuantely, but you can make some useful modifications to your liking.</p>
 <pre class="r"><code># plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.attgt, ylim = c(-.3,.3), type = &quot;calendar&quot;, theming = FALSE) +
+ggdid(mw.attgt, ylim = c(-.3, .3), type = &quot;calendar&quot;, theming = FALSE) +
   scale_color_viridis_d(begin = .75, end = .25, labels = c(&quot;Pre-treatment&quot;, &quot;Post-treatment&quot;)) +
   theme_bw() +
   theme(legend.position = &quot;bottom&quot;) +
@@ -599,12 +619,12 @@ summary(mw.dyn)</code></pre>
 ## Control Group:  Never Treated,  Anticipation Periods:  0
 ## Estimation Method:  Doubly Robust</code></pre>
 <pre class="r"><code>#use the default plot method
-ggdid(mw.dyn, ylim = c(-.3,.3))</code></pre>
+ggdid(mw.dyn, ylim = c(-.3, .3))</code></pre>
 <p><img src="case-b-event-study_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p><br></p>
 <pre class="r"><code># plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.dyn, ylim = c(-.3,.3), type = &quot;dynamic&quot;, theming = FALSE) +
+ggdid(mw.dyn, ylim = c(-.3, .3), type = &quot;dynamic&quot;, theming = FALSE) +
   scale_color_viridis_d(begin = .75, end = .25, labels = c(&quot;Pre-treatment&quot;, &quot;Post-treatment&quot;)) +
   theme_bw() +
   theme(legend.position = &quot;bottom&quot;) +
