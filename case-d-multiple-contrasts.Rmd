@@ -1,0 +1,22 @@
+---
+title: "Case D: Making your own graphic for complex contrasts"
+---
+
+<br>
+
+```{r setup}
+library(tidyverse)
+library(tidycensus)
+```
+
+
+
+- data: ACS tract data for change over time in composition
+
+- essential: tile, text
+- idea: get creative, but be mindful
+
+- what's (dare I say) fun about doing this sort of work is that you can be creative
+- as long as you are mindful about why you're using a viz over a table, you can really get off the beaten path
+- here we're going to work on a transition matrix figure I recently made since it illustrates how the use of shading can show contrast where numbers by themselves otherwise might induce eye-glazing. 
+- it also covers a couple new geoms 
