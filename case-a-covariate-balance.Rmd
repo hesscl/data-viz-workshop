@@ -54,7 +54,7 @@ While a table can certainly work for this sort of information (and beats nothing
 
 Enter: _the Love plot_. Credited to an author, Thomas E. Love, from [Ahmed et al. (2006)](https://doi.org/10.1093/eurheartj/ehi890), the following figure from that article presents absolute standardized mean differences (in terms of % of SD) as a plot based on points denoting each covariate's pre- and post-match value. 
 
-<center>![image](https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/eurheartj/27/12/10.1093/eurheartj/ehi890/2/ehi89001.gif?Expires=1652796924&Signature=NKj6k2Yr4Lsjupf1syr~HV3NKOFk1SXhegBDy~uQj2aYKoL~mOlHJwSOYCTLb31UE5Ddv6rFFN-aNBSwWAWVWdXx4aFKUcw9vq46d86noCR9dopTMwGrd~fcHMSqma9aqmlJSWk5qsxj9cGJCym92q6xJ9Ies-6GBGlFJ3J348bSqvArcXZdvol0Jrp8YqNXLqrpMMcmoNW1JjVP3NuMyVJzD8sdloGz0gpI8DuPtn7959KMxuMDElY-payXZzjKWnWEd3uu0fZIWLDhXpFHvr3oXB67Gox-c-vowiFdcxobG9i1NBNBXclV5FfGsuZwTtFuuRxSleae79oa5LiMSQ__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA)</center>
+<center>![](https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/eurheartj/27/12/10.1093/eurheartj/ehi890/2/ehi89001.gif?Expires=1652796924&Signature=NKj6k2Yr4Lsjupf1syr~HV3NKOFk1SXhegBDy~uQj2aYKoL~mOlHJwSOYCTLb31UE5Ddv6rFFN-aNBSwWAWVWdXx4aFKUcw9vq46d86noCR9dopTMwGrd~fcHMSqma9aqmlJSWk5qsxj9cGJCym92q6xJ9Ies-6GBGlFJ3J348bSqvArcXZdvol0Jrp8YqNXLqrpMMcmoNW1JjVP3NuMyVJzD8sdloGz0gpI8DuPtn7959KMxuMDElY-payXZzjKWnWEd3uu0fZIWLDhXpFHvr3oXB67Gox-c-vowiFdcxobG9i1NBNBXclV5FfGsuZwTtFuuRxSleae79oa5LiMSQ__&Key-Pair-Id=APKAIE5G5CRDK6RD3PGA)</center>
 
 <br>
 
@@ -367,8 +367,6 @@ ggplot(balance_stats, aes(x = abs(smd), y = fct_reorder(label, abs(smd)),
 
 For the last bit of ggploting for this case study, we will make some minor adjustments aimed at increasing the interpretability of the plot in ways beyond its organization. 
 
-If plot organization is the workhorse kosher salt of data visualization (work with me here), but these final tweaks are the, um, often important finishing salt of graphical displays (nailed it).
-
 Here the main adjustments are to:
 
 1. increase the point geometry size
@@ -404,6 +402,10 @@ We can see from our finalized Love plot that there are still absolute standardiz
 <br>
 
 ## Hands-on activity: Create a Love plot for the `lalonde` data set (used in many PS methods papers) or other demo PS data of your choice
+
+These data come from:
+
+> Dehejia, R. H., & Wahba, S. (1999). Causal effects in nonexperimental studies: Reevaluating the evaluation of training programs. Journal of the American statistical Association, 94(448), 1053-1062.
 
 Here the treatment is a job training program, with the outcome of interest being real earnings in 1978 (`re78`). The data are not balanced between treatment and control groups along the included covariates, so you should feel welcome to try using a matching method to construct weights or form a subsample that has greater balance along the covariates.
 

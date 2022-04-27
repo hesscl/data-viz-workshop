@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Case D: Making your own graphic for complex contrasts</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Purposeful Plotting</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-chart-line"></span>
+     
+    Case Studies
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="case-a-covariate-balance.html">Case A: Covariate Balance</a>
+    </li>
+    <li>
+      <a href="case-b-event-study.html">Case B: Event Studies</a>
+    </li>
+    <li>
+      <a href="case-c-spatial-distribution.html">Case C: Spatial Distribution</a>
+    </li>
+    <li>
+      <a href="case-d-multiple-contrasts.html">Case D: Multiple Contrasts</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="fa fa-info"></span>
+     
+    Resources
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="resources-ggplot.html">ggplot</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Case D: Making your own graphic for complex contrasts</h1>
+
+</div>
+
+
+<p><br></p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<div id="software-dependencies" class="section level3">
+<h3>Software dependencies</h3>
+<pre class="r"><code>library(tidyverse)
+library(snakecase)
+library(patchwork)</code></pre>
+<p><br></p>
+</div>
+<div id="data" class="section level3">
+<h3>Data</h3>
+<div id="longitudinal-census-tract-data-from-nhgis" class="section level4">
+<h4>Longitudinal census tract data from NHGIS</h4>
+<p>The data for this case study are tract-level decennial Census estimates covering 1990-2020. These are geographically harmonized so a given tract is always defined by 2010 geography at the different time periods within this panel.</p>
+<pre class="r"><code>tract &lt;- read_csv(&quot;./data/nhgis0216_ts_geog2010_tract.csv&quot;)</code></pre>
+<pre><code>## Rows: 292228 Columns: 44
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (6): GISJOIN, STATE, STATEA, COUNTY, COUNTYA, TRACTA
+## dbl (38): GEOGYEAR, DATAYEAR, CW7AA, CW7AAL, CW7AAU, CW7AB, CW7ABL, CW7ABU, ...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p><br></p>
+<p>We’ll clean the loaded CSV into a table with more intuitive column labeling.</p>
+<pre class="r"><code>#do some initial munging
+tract &lt;- tract %&gt;%
+  mutate(tot_nl_w = round(CW7AA),
+         tot_nl_b = round(CW7AB),
+         tot_nl_aina = round(CW7AC),
+         tot_nl_api = round(CW7AD),
+         tot_nl_oth = round(CW7AE),
+         tot_nl_mult = round(CW7AF),
+         tot_lat = round(CW7AG+CW7AH+CW7AI+CW7AJ+CW7AK+CW7AL)) %&gt;%
+  rename_all(to_snake_case) %&gt;%
+  select(gisjoin, year = datayear, state:tracta, starts_with(&quot;tot&quot;)) %&gt;%
+  filter(year != 1990) %&gt;%
+  mutate(tot_pop = rowSums(select(., starts_with(&quot;tot&quot;))),
+         shr_nl_w = tot_nl_w/tot_pop,
+         shr_nl_b = tot_nl_b/tot_pop,
+         shr_nl_api = tot_nl_api/tot_pop,
+         shr_nl_oth = (tot_nl_aina+tot_nl_oth+tot_nl_mult)/tot_pop,
+         shr_lat = tot_lat/tot_pop)
+
+#inspect the result
+glimpse(tract)</code></pre>
+<pre><code>## Rows: 219,171
+## Columns: 20
+## $ gisjoin     &lt;chr&gt; &quot;G0100010020100&quot;, &quot;G0100010020200&quot;, &quot;G0100010020300&quot;, &quot;G01…
+## $ year        &lt;dbl&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000…
+## $ state       &lt;chr&gt; &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Alabama&quot;, &quot;Al…
+## $ statea      &lt;chr&gt; &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;, &quot;01&quot;…
+## $ county      &lt;chr&gt; &quot;Autauga County&quot;, &quot;Autauga County&quot;, &quot;Autauga County&quot;, &quot;Aut…
+## $ countya     &lt;chr&gt; &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;001&quot;, &quot;0…
+## $ tracta      &lt;chr&gt; &quot;020100&quot;, &quot;020200&quot;, &quot;020300&quot;, &quot;020400&quot;, &quot;020500&quot;, &quot;020600&quot;…
+## $ tot_nl_w    &lt;dbl&gt; 1722, 671, 2738, 4273, 5419, 2606, 2518, 1640, 6337, 3821,…
+## $ tot_nl_b    &lt;dbl&gt; 141, 1163, 491, 117, 355, 549, 281, 213, 1014, 633, 718, 1…
+## $ tot_nl_aina &lt;dbl&gt; 15, 6, 7, 10, 25, 12, 23, 3, 42, 18, 19, 6, 53, 41, 30, 24…
+## $ tot_nl_api  &lt;dbl&gt; 7, 7, 23, 32, 72, 7, 13, 3, 27, 11, 3, 1, 3, 10, 9, 9, 28,…
+## $ tot_nl_oth  &lt;dbl&gt; 2, 4, 2, 1, 11, 2, 0, 2, 3, 13, 0, 4, 0, 0, 6, 2, 3, 2, 7,…
+## $ tot_nl_mult &lt;dbl&gt; 21, 25, 23, 22, 65, 30, 14, 11, 75, 52, 16, 20, 36, 30, 30…
+## $ tot_lat     &lt;dbl&gt; 12, 16, 55, 101, 95, 66, 51, 14, 80, 81, 21, 18, 41, 30, 6…
+## $ tot_pop     &lt;dbl&gt; 1920, 1892, 3339, 4556, 6042, 3272, 2900, 1886, 7578, 4629…
+## $ shr_nl_w    &lt;dbl&gt; 0.8968750, 0.3546512, 0.8200060, 0.9378841, 0.8968884, 0.7…
+## $ shr_nl_b    &lt;dbl&gt; 0.073437500, 0.614693446, 0.147050015, 0.025680421, 0.0587…
+## $ shr_nl_api  &lt;dbl&gt; 0.0036458333, 0.0036997886, 0.0068882899, 0.0070237050, 0.…
+## $ shr_nl_oth  &lt;dbl&gt; 0.019791667, 0.018498943, 0.009583708, 0.007243196, 0.0167…
+## $ shr_lat     &lt;dbl&gt; 0.006250000, 0.008456660, 0.016471998, 0.022168569, 0.0157…</code></pre>
+<p><br></p>
+</div>
+</div>
+</div>
+<div id="motivation-how-to-visualize-neighborhood-change-across-different-starting-compositions-as-well-as-across-time" class="section level2">
+<h2>Motivation: how to visualize neighborhood change across different starting compositions, as well as across time?</h2>
+<p>The goal here is to visualize a set of relationships within our data that are relatively complex and multidimensional. This case study does show how to create a specific plot (a transition matrix), but it aims to be more instructive about how we can assemble a plot for which there is not really a starting template, much less a single geometry that accomplishes what we’re interested in.</p>
+<p>Transition matrices are a good example of such an complex analysis because they condense the observed change among a set of cases into a format where different trajectories over time are quantified in terms of what percent of cases that started in category A ended in category A, B, C, etc. So while the focus here is in terms of neighborhood compositions, you could certainly imagine other systems where cases are transitioning between a set of different states that could be analyzed through a similar strategy.</p>
+<p><br></p>
+<div id="add-a-neighborhood-composition-category-measure" class="section level3">
+<h3>Add a neighborhood composition category measure</h3>
+<p>The first step here is to define the categories that neighborhoods will be able to transition along over time. The data are long, so we do this once and it is applied in a consistent manner across all periods.</p>
+<pre class="r"><code>tract &lt;- tract %&gt;%
+  mutate(race_eth_cat = case_when(
+    
+    #predominant compositions
+    shr_nl_w &gt;= .75 ~ &quot;Predominantly White&quot;,
+    shr_nl_b &gt;= .75 ~ &quot;Predominantly Black&quot;,
+    shr_nl_api &gt;= .75 ~ &quot;Predominantly Asian/PI&quot;,
+    shr_lat &gt;= .75 ~ &quot;Predominantly Latinx&quot;,
+    
+    #shared compositions
+    shr_nl_w &lt; .75 &amp; shr_nl_w &gt;= .50 ~ &quot;White-Mixed&quot;,
+    (shr_nl_b &lt; .75 &amp; shr_nl_b &gt;= .50) |
+      (shr_lat &lt; .75 &amp; shr_lat &gt;= .50) |
+      (shr_nl_api &lt; .75 &amp; shr_nl_api &gt;= .50)  ~ &quot;Non-White-Mixed&quot;,
+    
+    #the rest
+    TRUE ~ &quot;Multiethnic&quot;
+  ))</code></pre>
+<p><br></p>
+</div>
+<div id="pivot-the-nhgis-panel-wider" class="section level3">
+<h3>Pivot the NHGIS panel wider</h3>
+<p>Then, since ggplot expects one row : one geometry when using <code>geom_*()</code> functions, we will pivot the data wider so that tracts uniquely identify each row and their time-varying composition is captured through appropriately-labelled columns.</p>
+<pre class="r"><code>wide_tract &lt;- tract %&gt;%
+  select(gisjoin, year, race_eth_cat) %&gt;%
+  pivot_wider(id_cols = gisjoin, names_from = year, names_prefix = &quot;race_eth_&quot;,
+              values_from = race_eth_cat)</code></pre>
+<p><br></p>
+</div>
+</div>
+<div id="make-a-transition-matrix-graphic" class="section level2">
+<h2>Make a transition matrix graphic</h2>
+<p>A reasonable first attempt might be to just start by summarizing and plotting the <code>wide_tract</code> table we just created.</p>
+<pre class="r"><code>#tally the counts of tracts with particular combinations, then mutate shares of 2010 total
+chg_matrix &lt;- wide_tract %&gt;%
+  group_by(race_eth_2010, race_eth_2020) %&gt;% 
+  tally %&gt;%
+  mutate(shr = n/sum(n))
+
+#preview what the data structure is
+chg_matrix</code></pre>
+<pre><code>## # A tibble: 38 × 4
+## # Groups:   race_eth_2010 [7]
+##    race_eth_2010   race_eth_2020              n      shr
+##    &lt;chr&gt;           &lt;chr&gt;                  &lt;int&gt;    &lt;dbl&gt;
+##  1 Multiethnic     Multiethnic             6837 0.808   
+##  2 Multiethnic     Non-White-Mixed         1329 0.157   
+##  3 Multiethnic     Predominantly Black        5 0.000591
+##  4 Multiethnic     Predominantly Latinx      10 0.00118 
+##  5 Multiethnic     Predominantly White        8 0.000946
+##  6 Multiethnic     White-Mixed              270 0.0319  
+##  7 Non-White-Mixed Multiethnic              942 0.130   
+##  8 Non-White-Mixed Non-White-Mixed         5667 0.783   
+##  9 Non-White-Mixed Predominantly Asian/PI    43 0.00594 
+## 10 Non-White-Mixed Predominantly Black       93 0.0129  
+## # … with 28 more rows</code></pre>
+<p><br></p>
+<p>So after summarizing <code>wide_tract</code> to <code>chg_matrix</code>, we assign the <code>y</code> aesthetic to 2010 composition categories, the <code>x</code> aesthetic to the 2020 categories and we take a look at the result:</p>
+<pre class="r"><code>ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020))</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><br></p>
+<p>This is on the right track, but now the question is what other geometry and aesthetics to use such that we convey the information about which 2020 categories were most common for tracts with different 2010 categories. There are also things like labels that we’ll want to improve on, but we’ve at least arrived at the structure our data should be in for the target transition matrix visualization.</p>
+<pre class="r"><code>ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020, fill = shr)) +
+  geom_tile()</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><br></p>
+<p>Eeeeeeck! Why are there all those empty tiles? Because the data structure is technically correct, but we have particular X and Y combinations that are not observed (e.g., a 2010 Predominantly Black neighborhood becoming Predominantly White by 2020).</p>
+<p>These empty tiles are not structural zeroes (i.e., these trajectories <em>could</em> have happened, but just did not), so our solution will be to use a grid with all possible combinations in tandem with the summary data that we did in fact observe.</p>
+<div id="fixing-the-data" class="section level3">
+<h3>Fixing the data</h3>
+<p>We first use <code>expand_grid()</code> to construct the full set of possible 2010 and 2020 composition combinations.</p>
+<pre class="r"><code>#first, make a grid with all possible combinations
+chg_grid &lt;- expand_grid(race_eth_2010 = unique(wide_tract$race_eth_2010),
+                        race_eth_2020 = unique(wide_tract$race_eth_2020))
+
+chg_grid</code></pre>
+<pre><code>## # A tibble: 49 × 2
+##    race_eth_2010       race_eth_2020         
+##    &lt;chr&gt;               &lt;chr&gt;                 
+##  1 Predominantly White Predominantly White   
+##  2 Predominantly White Non-White-Mixed       
+##  3 Predominantly White White-Mixed           
+##  4 Predominantly White Multiethnic           
+##  5 Predominantly White Predominantly Black   
+##  6 Predominantly White Predominantly Latinx  
+##  7 Predominantly White Predominantly Asian/PI
+##  8 Non-White-Mixed     Predominantly White   
+##  9 Non-White-Mixed     Non-White-Mixed       
+## 10 Non-White-Mixed     White-Mixed           
+## # … with 39 more rows</code></pre>
+<p><br></p>
+<pre class="r"><code>#then, do the summary like before but join the grid and set NA values to 0 as appropriate.
+chg_matrix &lt;- wide_tract %&gt;%
+  group_by(race_eth_2010, race_eth_2020) %&gt;% 
+  tally %&gt;%
+  mutate(shr = n/sum(n)) %&gt;%
+  right_join(chg_grid) %&gt;%
+  mutate(n = ifelse(is.na(n), 0, n),
+         shr = ifelse(is.na(shr), 0, shr)) %&gt;%
+  mutate(race_eth_2010 = fct_reorder(race_eth_2010, n),
+         sum = sum(n)) </code></pre>
+<pre><code>## Joining, by = c(&quot;race_eth_2010&quot;, &quot;race_eth_2020&quot;)</code></pre>
+<pre class="r"><code>#now try making the basic plot again
+ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020, fill = shr)) +
+  geom_tile()</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-9-1.png" width="672" /> <br></p>
+</div>
+<div id="adjusting-the-coordinate-system" class="section level3">
+<h3>Adjusting the coordinate system</h3>
+<p>OK, so we now have a complete set of cells for our matrix graphic, but we need to improve on it a lot before it will be a finished product.</p>
+<p>Let’s start by first improving the legibility of the stuff that’s already being visualized. We will add <code>coord_equal()</code> since we want each tile to be a square, not the rectangularish shape that the tiles are currently taking. This function is similarly useful in the context of actual vs. predicted graphics where we want one-unit increments to be treated the same within the graphic.</p>
+<pre class="r"><code>ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020, fill = shr)) +
+  coord_equal() +
+  geom_tile()</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-10-1.png" width="672" /> <br></p>
+</div>
+<div id="making-the-labels-legible" class="section level3">
+<h3>Making the labels legible</h3>
+<p>Now let’s work on the axis labels since they are <em>really</em> poorly laid out on the x-axis given the labels’ character lengths. We remove the panel.grid (already more or less covered by the tiles) and then we rotate and re-position the x-axis labels so we can read each of them more easily.</p>
+<pre class="r"><code>ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020, fill = shr)) +
+  coord_equal() +
+  geom_tile() +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  labs(x = &quot;\n2020 Racial/Ethnic Composition&quot;, 
+       y = &quot;2010 Racial/Ethnic Composition\n&quot;)</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><br></p>
+<p>This is better, and we can certainly make out the important takeaway that most neighborhoods have stayed the same composition between 2010 and 2020. But how different are the off-diagonal values? This is a clear case where the continuous fill scale has some limitations for understanding precise differences.</p>
+<p>Instead of binning or categorizing values, we will use labels for each cell that simply provide the relevent proportion statistic for a given cell.</p>
+<pre class="r"><code>ggplot(chg_matrix, aes(y = race_eth_2010, x = race_eth_2020, fill = shr, 
+                       label = paste0(round(shr, 2) * 100, &quot;%&quot;))) +
+  coord_equal() +
+  geom_tile() +
+  geom_label() +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  labs(x = &quot;\n2020 Racial/Ethnic Composition&quot;, 
+       y = &quot;2010 Racial/Ethnic Composition\n&quot;)</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><br></p>
+<p>Well, this isn’t quite what we were looking for. The reason is just that <code>geom_label()</code> doesn’t include an opaque background within each label by default. With a little tweaking we can get to where we want to go:</p>
+<pre class="r"><code>ggplot(chg_matrix, 
+       aes(y = race_eth_2010, x = race_eth_2020, fill = shr, 
+           label = paste0(round(shr, 2) * 100, &quot;%&quot;))) +
+  coord_equal() +
+  geom_tile(color = &quot;Black&quot;) +
+  geom_label(color = &quot;Black&quot;, fill = &quot;white&quot;, size = 3) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  labs(x = &quot;\n2020 Racial/Ethnic Composition&quot;, 
+       y = &quot;2010 Racial/Ethnic Composition\n&quot;)</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="improving-the-use-of-color" class="section level3">
+<h3>Improving the use of color</h3>
+<p>Ok, super close to finished now. Some of the last things we will do are to change the color scale to grayscale so that 0% is white and 100% is black. This will print just fine in B/W, and more importantly leverage how we perceive differences in <em>value</em> (i.e., lightness/darkness of a color) more effectively than the black-to-blue palette that only partially accomplishes this.</p>
+<pre class="r"><code>ggplot(chg_matrix, 
+       aes(y = race_eth_2010, x = race_eth_2020, fill = shr, 
+           label = paste0(round(shr, 2) * 100, &quot;%&quot;))) +
+  coord_equal() +
+  geom_tile(color = &quot;Black&quot;) +
+  geom_label(color = &quot;Black&quot;, fill = &quot;white&quot;, size = 3) +
+  scale_fill_gradient(limits = c(0, 1), low = &quot;white&quot;, high = &quot;black&quot;) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  guides(fill = &quot;none&quot;) +
+  labs(x = &quot;\n2020 Racial/Ethnic Composition&quot;, 
+       y = &quot;2010 Racial/Ethnic Composition\n&quot;)</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="assembling-our-final-product" class="section level3">
+<h3>Assembling our final product</h3>
+<p>In this case, we want to classify the types from predominant -&gt; mixed -&gt; multiethnic, so we make the racial/ethnic composition categories into factor type columns, and then manually sort the categories to accomplish this task.</p>
+<p><code>relevel()</code> is useful if you only care about setting the first factor level which R treats as the reference group in contexts like regression, whereas <code>fct_reorder()</code> is great if there is a numeric measure to sort the categories along. Unfortunately, those don’t apply neatly in this context so when all else fails, you want to first assign a measure as factor, then draw on the levels of that factor measure when reassigning the measure to have the levels in the order we desire.</p>
+<pre class="r"><code>#coerce to factor
+chg_matrix$race_eth_2010 &lt;- factor(chg_matrix$race_eth_2010)
+
+#inspect starting levels
+levels(chg_matrix$race_eth_2010)</code></pre>
+<pre><code>## [1] &quot;Multiethnic&quot;            &quot;Non-White-Mixed&quot;        &quot;Predominantly Asian/PI&quot;
+## [4] &quot;Predominantly Black&quot;    &quot;Predominantly Latinx&quot;   &quot;Predominantly White&quot;   
+## [7] &quot;White-Mixed&quot;</code></pre>
+<pre class="r"><code>#reorder levels
+chg_matrix$race_eth_2010 &lt;- factor(chg_matrix$race_eth_2010, levels = rev(levels(chg_matrix$race_eth_2010)[c(6, 4, 5, 3, 7, 2, 1)]))
+
+#inspect reordered levels
+levels(chg_matrix$race_eth_2010)</code></pre>
+<pre><code>## [1] &quot;Multiethnic&quot;            &quot;Non-White-Mixed&quot;        &quot;White-Mixed&quot;           
+## [4] &quot;Predominantly Asian/PI&quot; &quot;Predominantly Latinx&quot;   &quot;Predominantly Black&quot;   
+## [7] &quot;Predominantly White&quot;</code></pre>
+<pre class="r"><code>#now do the same to 2020, making the factor levels follow the same order as 2010
+chg_matrix$race_eth_2020 &lt;- factor(chg_matrix$race_eth_2020)
+chg_matrix$race_eth_2020 &lt;- factor(chg_matrix$race_eth_2020, levels = levels(chg_matrix$race_eth_2010))
+
+#assign the result so we can use it later too
+chg_matrix_gg &lt;- ggplot(chg_matrix, 
+       aes(y = race_eth_2010, x = race_eth_2020, fill = shr, 
+           label = paste0(round(shr, 2) * 100, &quot;%&quot;))) +
+  coord_equal() +
+  geom_tile(color = &quot;Black&quot;) +
+  geom_label(color = &quot;Black&quot;, fill = &quot;white&quot;, size = 3) +
+  scale_fill_gradient(limits = c(0, 1), low = &quot;white&quot;, high = &quot;black&quot;) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  guides(fill = &quot;none&quot;) +
+  labs(x = &quot;\n2020 Racial/Ethnic Composition&quot;, 
+       y = &quot;2010 Racial/Ethnic Composition\n&quot;)
+
+#plot the result
+chg_matrix_gg</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><br></p>
+</div>
+</div>
+<div id="make-a-combined-set-of-graphics-for-transitions-between-2000-2010-and-2010-2020" class="section level2">
+<h2>Make a combined set of graphics for transitions between 2000-2010 and 2010-2020</h2>
+<p>Let’s say we now want to have a figure that has one panel for 2000-2010 transitions and another panel for 2010-2020 transitions.</p>
+<p>Normally the best way to create multipaneled visualizations with <code>ggplot()</code> is to generate data that is structured long such that <code>facet_grid()</code> and <code>facet_wrap()</code> will allow plotting the other aesthetics separately by the facetting variable. In this case, since we want the <code>x</code> and <code>y</code> variables to vary by plot, it is easier to create separate plots, assign them to objects and then assemble them with the <code>patchwork</code> library. We <em>could</em> go back and manipulate the data to this end (create a <span class="math inline">\(t-1\)</span> and <span class="math inline">\(t\)</span> columns for composition, facet by <span class="math inline">\(t\)</span> year), but in this case that’d mean we need to retool all of the existing code to some extent (boo). So IMHO, this is a case where <code>patchwork</code> is a great fit since it drops into what we’ve already done in a neat manner.</p>
+<p>The <code>patchwork</code> library excels at assembling ggplots that have varying aesethetics across the panels, even if just in a minor sense like the present case. We won’t review all of its functionality since there are great vignettes on the package website, but the gist of it is that you can use <code>+</code>, <code>/</code> and <code>(</code>/<code>)</code> operators to assemble plots together. You could use the same operators provided by <code>patchwork</code> to assemble a bar graph and a line graph (e.g.), so this is the way to assemble plots whenever faceting with built-in ggplot functions does not make sense.</p>
+<p><br></p>
+<div id="create-a-2000-2010-matrix" class="section level3">
+<h3>Create a 2000-2010 matrix</h3>
+<p>First we’ll use lightly modified code to create a change matrix for the 2000-2010 period.</p>
+<pre class="r"><code>chg_grid_2010 &lt;- expand_grid(race_eth_2000 = unique(wide_tract$race_eth_2000),
+                             race_eth_2010 = unique(wide_tract$race_eth_2010))
+
+chg_matrix_2010 &lt;- wide_tract %&gt;%
+  group_by(race_eth_2000, race_eth_2010) %&gt;% 
+  tally %&gt;%
+  mutate(shr = n/sum(n)) %&gt;%
+  right_join(chg_grid_2010) %&gt;%
+  mutate(n = ifelse(is.na(n), 0, n),
+         shr = ifelse(is.na(shr), 0, shr)) %&gt;%
+  mutate(race_eth_2000 = fct_reorder(race_eth_2000, n),
+         sum = sum(n)) </code></pre>
+<pre><code>## Joining, by = c(&quot;race_eth_2000&quot;, &quot;race_eth_2010&quot;)</code></pre>
+<pre class="r"><code>chg_matrix_2010$race_eth_2000 &lt;- factor(chg_matrix_2010$race_eth_2000)
+chg_matrix_2010$race_eth_2000 &lt;- factor(chg_matrix_2010$race_eth_2000, levels = rev(levels(chg_matrix_2010$race_eth_2000)[c(6, 4, 5, 3, 7, 2, 1)]))
+
+chg_matrix_2010$race_eth_2010 &lt;- factor(chg_matrix_2010$race_eth_2010)
+chg_matrix_2010$race_eth_2010 &lt;- factor(chg_matrix_2010$race_eth_2010, levels = levels(chg_matrix_2010$race_eth_2000))
+
+chg_matrix_2010_gg &lt;- ggplot(chg_matrix_2010, 
+       aes(y = race_eth_2000, x = race_eth_2010, fill = shr, 
+           label = paste0(round(shr, 2) * 100, &quot;%&quot;))) +
+  coord_equal() +
+  geom_tile(color = &quot;Black&quot;) +
+  geom_label(color = &quot;Black&quot;, fill = &quot;white&quot;, size = 3) +
+  scale_fill_gradient(limits = c(0, 1), low = &quot;white&quot;, high = &quot;black&quot;) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)) +
+  guides(fill = &quot;none&quot;) +
+  labs(x = &quot;\n2010 Racial/Ethnic Composition&quot;, 
+       y = &quot;2000 Racial/Ethnic Composition\n&quot;)
+
+chg_matrix_2010_gg</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="use-patchwork-to-assemble-them" class="section level3">
+<h3>Use patchwork to assemble them</h3>
+<p>Then it is as simple as “adding”the plots together</p>
+<pre class="r"><code>chg_matrix_2010_gg + chg_matrix_gg</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-17-1.png" width="1152" /></p>
+<p><br></p>
+<p>If you pass additional functions to the sum of the plots with <code>&amp;</code>, the ggplot modifications are applied to both subplots. Here we add a bit of padding between the two plots.</p>
+<pre class="r"><code>chg_matrix_2010_gg + chg_matrix_gg &amp;
+  theme(plot.margin = unit(c(.2, .2, .2, .2), &quot;in&quot;))</code></pre>
+<p><img src="case-d-multiple-contrasts_files/figure-html/unnamed-chunk-18-1.png" width="1152" /></p>
+<p><br></p>
+</div>
+</div>
+<div id="hands-on-use-blanden-from-the-markovchain-library-to-generate-a-transition-matrix-graphic-for-integenerational-income-quartile-mobility." class="section level2">
+<h2>Hands-on: Use <code>blanden</code> from the <code>markovchain</code> library to generate a transition matrix graphic for integenerational income quartile mobility.</h2>
+<p>The rows represent fathers’ income quartile when the son is aged 16, whilst the columns represent sons’ income quartiles when he is aged 30 (in 2000).</p>
+<pre class="r"><code>library(markovchain)</code></pre>
+<pre><code>## Package:  markovchain
+## Version:  0.8.6
+## Date:     2021-05-17
+## BugReport: https://github.com/spedygiorgio/markovchain/issues</code></pre>
+<pre class="r"><code>data(blanden)
+blanden</code></pre>
+<pre><code>##        Bottom  2nd  3rd  Top
+## Bottom   0.38 0.29 0.22 0.11
+## 2nd      0.25 0.28 0.26 0.22
+## 3rd      0.21 0.26 0.28 0.24
+## Top      0.16 0.17 0.25 0.42</code></pre>
+<pre class="r"><code>#?blanden - use help page for more information
+
+blanden &lt;- as.data.frame(blanden)
+glimpse(blanden)</code></pre>
+<pre><code>## Rows: 16
+## Columns: 3
+## $ Var1 &lt;fct&gt; Bottom, 2nd, 3rd, Top, Bottom, 2nd, 3rd, Top, Bottom, 2nd, 3rd, T…
+## $ Var2 &lt;fct&gt; Bottom, Bottom, Bottom, Bottom, 2nd, 2nd, 2nd, 2nd, 3rd, 3rd, 3rd…
+## $ Freq &lt;dbl&gt; 0.38, 0.25, 0.21, 0.16, 0.29, 0.28, 0.26, 0.17, 0.22, 0.26, 0.28,…</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

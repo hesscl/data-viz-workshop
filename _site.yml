@@ -1,0 +1,28 @@
+name: Test dashboard
+navbar:
+  title: Purposeful Plotting
+  left:
+  - text: "Home"
+    icon: fa-home
+    href: index.html
+  - text: "Case Studies"
+    icon: fa-chart-line
+    menu:
+    - text: "Case A: Covariate Balance"
+      href: case-a-covariate-balance.html
+    - text: "Case B: Event Studies"
+      href: case-b-event-study.html
+    - text: "Case C: Spatial Distribution"
+      href: case-c-spatial-distribution.html
+    - text: "Case D: Multiple Contrasts"
+      href: case-d-multiple-contrasts.html
+  - text: "Resources"
+    icon: fa-info
+    menu:
+    - text: "ggplot"
+      href: resources-ggplot.html
+
+output:
+  html_document:
+    theme: lumen
+    source_code: embed

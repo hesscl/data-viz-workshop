@@ -1,0 +1,17 @@
+Var1,Var2,Freq
+Bottom,Bottom,0.38
+2nd,Bottom,0.25
+3rd,Bottom,0.21
+Top,Bottom,0.16
+Bottom,2nd,0.29
+2nd,2nd,0.28
+3rd,2nd,0.26
+Top,2nd,0.17
+Bottom,3rd,0.22
+2nd,3rd,0.26
+3rd,3rd,0.28
+Top,3rd,0.25
+Bottom,Top,0.11
+2nd,Top,0.22
+3rd,Top,0.24
+Top,Top,0.42

@@ -342,7 +342,8 @@ $(document).ready(function () {
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(fixest)      #for simpler DD models
-library(did)         #for event study models</code></pre>
+library(did)         #for event study models
+library(broom)       #quickly process model output</code></pre>
 <p><br></p>
 </div>
 </div>
@@ -504,7 +505,55 @@ ggplot(dd_2_period, aes(x = period, y = mean_Y, shape = factor(treat),
 <h2>What are the average treatment effects?</h2>
 <div id="two-time-periods" class="section level3">
 <h3>Two time periods</h3>
-<p>Since a two period design produces a single estimate for the ATT, this is really a case where graphics don’t offer much beyond conveying this information through a table.</p>
+<p>Since a two period design produces a single estimate for the ATT, this is really a case where graphics don’t offer much beyond conveying this information through a table if our focus is on a single model.</p>
+<pre class="r"><code>#estimate TWFE
+model_2period &lt;- feols(Y ~ period * treat | id, sim_2_period)</code></pre>
+<pre><code>## The variable &#39;treat&#39; has been removed because of collinearity (see $collin.var).</code></pre>
+<pre class="r"><code>#give the summary info
+summary(model_2period)</code></pre>
+<pre><code>## OLS estimation, Dep. Var.: Y
+## Observations: 6,816 
+## Fixed-effects: id: 3,408
+## Standard-errors: Clustered (id) 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## period       0.709973   0.040592 17.4905 &lt; 2.2e-16 ***
+## period:treat 1.569548   0.057843 27.1348 &lt; 2.2e-16 ***
+## ... 1 variable was removed because of collinearity (treat)
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## RMSE: 0.84385     Adj. R2: 0.786127
+##                 Within R2: 0.496142</code></pre>
+<p><br></p>
+<p>Now it is common to have multiple models due to including covariates, looking at particular subgroups or other reasons, and in these cases there could be value to presenting the focal information about the ATT provided by the different models’ DD coefficients in a visualization (with the relevant model table in appendix).</p>
+<p>Here we arbitrarily model the odd and even ID’ed cases separately to illustrate what a multi-model graphic might look like using the DD coefficients and their SEs.</p>
+<pre class="r"><code>model_2period_odds &lt;- feols(Y ~ period * treat | id, sim_2_period %&gt;% filter(id %% 2 == 1))</code></pre>
+<pre><code>## The variable &#39;treat&#39; has been removed because of collinearity (see $collin.var).</code></pre>
+<pre class="r"><code>model_2period_evens &lt;- feols(Y ~ period * treat | id, sim_2_period %&gt;% filter(id %% 2 == 0))</code></pre>
+<pre><code>## The variable &#39;treat&#39; has been removed because of collinearity (see $collin.var).</code></pre>
+<pre class="r"><code>coef_2period &lt;- tidy(model_2period) %&gt;%
+  as_tibble() %&gt;%
+  mutate(model = &quot;Overall&quot;)
+
+coef_2period_odds &lt;- tidy(model_2period_odds) %&gt;%
+  as_tibble() %&gt;%
+  mutate(model = &quot;Odds&quot;)
+
+coef_2period_evens &lt;- tidy(model_2period_evens) %&gt;%
+  as_tibble() %&gt;%
+  mutate(model = &quot;Evens&quot;)
+
+model_coefs &lt;- bind_rows(coef_2period, coef_2period_odds, coef_2period_evens) %&gt;%
+  filter(str_detect(term, &quot;treat&quot;))
+
+ggplot(model_coefs, aes(x = estimate, y = model, 
+                        xmin = estimate - 1.96 * std.error,
+                        xmax = estimate + 1.96 * std.error)) +
+  geom_errorbarh() +
+  geom_point() +
+  geom_vline(xintercept = 0) +
+  theme_bw() +
+  labs(x = &quot;\nDD Coefficient&quot;, y = &quot;Model Specification\n&quot;)</code></pre>
+<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p><br></p>
 </div>
 <div id="multiple-time-periods" class="section level3">
@@ -554,7 +603,7 @@ summary(mw.attgt) </code></pre>
 <pre class="r"><code># plot the results
 # set ylim so that all plots have the same scale along y-axis
 ggdid(mw.attgt, ylim = c(-.3, .3), type = &quot;calendar&quot;)</code></pre>
-<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p><br></p>
 </div>
 <div id="a-note-about-using-color-in-figures" class="section level3">
@@ -578,7 +627,7 @@ ggdid(mw.attgt, ylim = c(-.3, .3), type = &quot;calendar&quot;, theming = FALSE)
   labs(title = &quot;&quot;, subtitle = &quot;&quot;)</code></pre>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-11-1.png" width="576" /></p>
+<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-13-1.png" width="576" /></p>
 <p><br></p>
 <p>and, what would folks viewing our figure in print see?</p>
 <p><img src="etc/mpdta-plot-bw.png" id="id" class="class" style="width:65.0%;height:65.0%" /></p>
@@ -620,7 +669,7 @@ summary(mw.dyn)</code></pre>
 ## Estimation Method:  Doubly Robust</code></pre>
 <pre class="r"><code>#use the default plot method
 ggdid(mw.dyn, ylim = c(-.3, .3))</code></pre>
-<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p><br></p>
 <pre class="r"><code># plot the results
 # set ylim so that all plots have the same scale along y-axis
@@ -631,11 +680,17 @@ ggdid(mw.dyn, ylim = c(-.3, .3), type = &quot;dynamic&quot;, theming = FALSE) +
   labs(title = &quot;&quot;, subtitle = &quot;&quot;)</code></pre>
 <pre><code>## Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
 ## which will replace the existing scale.</code></pre>
-<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="case-b-event-study_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p><br></p>
 </div>
-<div id="hands-on-use-the-injury-data-or-your-own-data-to-make-graphics-for-trends-over-time." class="section level2">
-<h2>Hands-on: Use the <code>injury</code> data or your own data to make graphics for trends over time.</h2>
+<div id="hands-on-use-the-injury-data-or-your-own-data-to-make-graphics-for-a-dd-model" class="section level2">
+<h2>Hands-on: Use the <code>injury</code> data or your own data to make graphics for a DD model</h2>
+<p>The following hands-on practice uses data from the following article.</p>
+<blockquote>
+<p>B.D. Meyer, W.K. Viscusi, and D.L. Durbin (1995), “Workers’ Compensation and Injury Duration: Evidence from a Natural Experiment,” American Economic Review 85, 322-340.</p>
+</blockquote>
+<p>Since these are data from an R library, you can view the codebook <a href="https://rdrr.io/cran/wooldridge/man/injury.html">here</a>.</p>
+<p>Model the data for Kentucky (<code>ki</code>) and Michigan (<code>mi</code>) separately. Make <code>log(durat)</code> the dependent variable, <code>afchnge</code> the policy change dummy variable (i.e., 1 = after policy change) and <code>highearn</code> the dummy variable for high earners (i.e., 1 = high earner).</p>
 <pre class="r"><code>injury &lt;- read_csv(&quot;./data/injury.csv&quot;)</code></pre>
 <pre><code>## Rows: 7150 Columns: 30
 ## ── Column specification ────────────────────────────────────────────────────────

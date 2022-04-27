@@ -341,10 +341,7 @@ $(document).ready(function () {
 <h3>Visualizing balance statistics</h3>
 <p>Enter: <em>the Love plot</em>. Credited to an author, Thomas E. Love, from <a href="https://doi.org/10.1093/eurheartj/ehi890">Ahmed et al. (2006)</a>, the following figure from that article presents absolute standardized mean differences (in terms of % of SD) as a plot based on points denoting each covariate’s pre- and post-match value.</p>
 <center>
-<div class="figure">
-<img src="https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/eurheartj/27/12/10.1093/eurheartj/ehi890/2/ehi89001.gif?Expires=1652796924&amp;Signature=NKj6k2Yr4Lsjupf1syr~HV3NKOFk1SXhegBDy~uQj2aYKoL~mOlHJwSOYCTLb31UE5Ddv6rFFN-aNBSwWAWVWdXx4aFKUcw9vq46d86noCR9dopTMwGrd~fcHMSqma9aqmlJSWk5qsxj9cGJCym92q6xJ9Ies-6GBGlFJ3J348bSqvArcXZdvol0Jrp8YqNXLqrpMMcmoNW1JjVP3NuMyVJzD8sdloGz0gpI8DuPtn7959KMxuMDElY-payXZzjKWnWEd3uu0fZIWLDhXpFHvr3oXB67Gox-c-vowiFdcxobG9i1NBNBXclV5FfGsuZwTtFuuRxSleae79oa5LiMSQ__&amp;Key-Pair-Id=APKAIE5G5CRDK6RD3PGA" alt="" />
-<p class="caption">image</p>
-</div>
+<img src="https://oup.silverchair-cdn.com/oup/backfile/Content_public/Journal/eurheartj/27/12/10.1093/eurheartj/ehi890/2/ehi89001.gif?Expires=1652796924&amp;Signature=NKj6k2Yr4Lsjupf1syr~HV3NKOFk1SXhegBDy~uQj2aYKoL~mOlHJwSOYCTLb31UE5Ddv6rFFN-aNBSwWAWVWdXx4aFKUcw9vq46d86noCR9dopTMwGrd~fcHMSqma9aqmlJSWk5qsxj9cGJCym92q6xJ9Ies-6GBGlFJ3J348bSqvArcXZdvol0Jrp8YqNXLqrpMMcmoNW1JjVP3NuMyVJzD8sdloGz0gpI8DuPtn7959KMxuMDElY-payXZzjKWnWEd3uu0fZIWLDhXpFHvr3oXB67Gox-c-vowiFdcxobG9i1NBNBXclV5FfGsuZwTtFuuRxSleae79oa5LiMSQ__&amp;Key-Pair-Id=APKAIE5G5CRDK6RD3PGA" />
 </center>
 <p><br></p>
 <blockquote>
@@ -631,6 +628,10 @@ ggplot(balance_stats, aes(x = abs(smd), y = fct_reorder(label, abs(smd)),
 </div>
 <div id="hands-on-activity-create-a-love-plot-for-the-lalonde-data-set-used-in-many-ps-methods-papers-or-other-demo-ps-data-of-your-choice" class="section level2">
 <h2>Hands-on activity: Create a Love plot for the <code>lalonde</code> data set (used in many PS methods papers) or other demo PS data of your choice</h2>
+<p>These data come from:</p>
+<blockquote>
+<p>Dehejia, R. H., &amp; Wahba, S. (1999). Causal effects in nonexperimental studies: Reevaluating the evaluation of training programs. Journal of the American statistical Association, 94(448), 1053-1062.</p>
+</blockquote>
 <p>Here the treatment is a job training program, with the outcome of interest being real earnings in 1978 (<code>re78</code>). The data are not balanced between treatment and control groups along the included covariates, so you should feel welcome to try using a matching method to construct weights or form a subsample that has greater balance along the covariates.</p>
 <pre class="r"><code>lalonde &lt;- read_csv(&quot;https://raw.githubusercontent.com/robjellis/lalonde/master/lalonde_data.csv&quot;)</code></pre>
 <pre><code>## Rows: 614 Columns: 11

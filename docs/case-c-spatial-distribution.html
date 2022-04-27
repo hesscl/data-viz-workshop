@@ -641,7 +641,7 @@ bi_map</code></pre>
 <pre class="r"><code>#add legend
 ggdraw() +
   draw_plot(bi_map, 0, 0, 1, 1) +
-  draw_plot(bi_legend, 0.65, .15, 0.25, 0.25)</code></pre>
+  draw_plot(bi_legend, 0.65, .15, 0.35, 0.35)</code></pre>
 <p><img src="case-c-spatial-distribution_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
 <p><br></p>
 <p>Given the prior points about choosing colors wisely, there are a couple options. Using <code>ggpattern</code>, it’s possible to construct a bivariate map that uses hatching for one of the colors so that it is accessible to readers viewing in a grayscale format still. Takes a lot more effort, but the end result passes inspection when viewed as grayscale.</p>
@@ -696,8 +696,9 @@ ggdraw() +
 <p><img src="case-c-spatial-distribution_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 <p><br></p>
 </div>
-<div id="hands-on-use-the-austin-data-or-your-own-data-to-make-graphics-for-trends-over-time." class="section level2">
-<h2>Hands-on: Use the <code>austin</code> data or your own data to make graphics for trends over time.</h2>
+<div id="hands-on-use-the-austin-data-or-your-own-data-to-make-graphics-for-spatial-distribution-of-rent-and-listings-among-zillow-and-gosection8." class="section level2">
+<h2>Hands-on: Use the <code>austin</code> data or your own data to make graphics for spatial distribution of rent and listings among Zillow and GoSection8.</h2>
+<p>These data are from the same project, but differ in terms of the listing platforms that are included as well as the geographic area that is covered. Nonetheless, you should be able to explore these data using code that is mostly similar to the above, OR if you so choose, you can explore these data by writing our own <code>ggplot()</code> code for spatial visualizations.</p>
 <pre class="r"><code>#load a similar extract of data based on Austin metro area listings
 austin &lt;- read_csv(&quot;./data/austin-metro-listing-sample.csv&quot;)</code></pre>
 <pre><code>## Rows: 27398 Columns: 8

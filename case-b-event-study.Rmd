@@ -38,11 +38,12 @@ For relatively simple designs, it's straightforward to estimate the models and m
 library(tidyverse)   #dplyr, ggplot2
 library(fixest)      #for simpler DD models
 library(did)         #for event study models
+library(broom)       #quickly process model output
 ```
 
 <br>
 
-### Data
+## Data
 
 ### Fake two-period DD data
 
@@ -113,13 +114,13 @@ dd_2_period <- dd_2_period %>%
   mutate(cf = ifelse(period == 1, mean_Y, mean_Y[period == 1] + chg[treat == 0]))
 
 ggplot(dd_2_period, aes(x = period, y = mean_Y, shape = factor(treat), 
-                        group = treat, linetype = "observed")) +
+                        group = treat, linetype = "Observed")) +
   geom_line() +
-  geom_line(aes(x = period, y = cf, linetype = "counterfactual")) +
-  geom_point(aes(x = period, y = cf), size = 3) +
+  geom_line(aes(x = period, y = cf, linetype = "Counterfactual")) +
+  geom_point(aes(x = period, y = cf), size = 2.5) +
   geom_point(size = 3) +
   scale_x_continuous(breaks = c(1, 2), labels = c("Pre-treatment", "Post-treatment")) +
-  scale_shape_discrete(labels = c("control", "treated")) +
+  scale_shape_discrete(labels = c("Control", "Treated")) +
   scale_linetype_manual(values = c(2, 1)) +
   labs(x = "", y = "Average Y\n", shape = "", linetype = "") +
   theme_bw() +
@@ -146,21 +147,47 @@ means <- mpdta %>%
 ggplot(means, aes(x = year, y = lemp, group = treat, shape = factor(treat))) +
   geom_vline(xintercept = 2006) +
   geom_line() +
-  geom_point() +
-  theme_bw()
+  geom_point(size = 2.5) +
+  scale_shape_discrete(labels = c("Control", "Treated")) +
+  theme_bw() +
+  theme(legend.position = "bottom", 
+        panel.grid.minor = element_blank()) +
+  labs(x = "", y = "Logged Teen Employment\n", shape = "")
 ```
+
+<br>
+
+In contrast, with treatment timing we have to retool things a bit. The result is not quite as simple since the small multiples are needed, but by overlaying the control group in each panel it is easier to make the implied comparison than if we had a separate panel for those cases.
 
 ```{r}
 means <- mpdta %>%
-  mutate(first.treat = ifelse(first.treat == 0, NA, first.treat)) %>%
   group_by(year, first.treat, treat) %>%
-  summarize(lemp = mean(lemp))
+  summarize(lemp = mean(lemp)) %>%
+  ungroup() %>%
+  mutate(first.treat = ifelse(first.treat == 0, NA, first.treat)) %>%
+  rowwise() %>%
+  mutate(first.treat.chr = case_when(
+           is.na(first.treat) ~ list(c(2004, 2006, 2007)), 
+           TRUE ~ list(unique(first.treat)))) %>%
+  ungroup() %>%
+  unnest(first.treat.chr)
 
-ggplot(means, aes(x = year, y = lemp, color = factor(first.treat), group = factor(first.treat))) +
-  facet_grid(~ first.treat) +
+ggplot(means, aes(x = year, y = lemp, 
+                  shape = factor(first.treat), linetype = is.na(first.treat),
+                  group = factor(first.treat))) +
+  facet_wrap(~ paste("First Treated:", first.treat.chr)) +
   geom_vline(aes(xintercept = first.treat)) +
   geom_line() +
-  geom_point()
+  geom_point() +
+  geom_point() +
+  scale_linetype_discrete(labels = c("Treated", "Control")) +
+  scale_shape_discrete(na.value = 4, labels = c("2004", "2006", "2007", "Control")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        panel.spacing = unit(.2, "in"),
+        panel.grid.minor = element_blank()) +
+  labs(x = "", y = "Logged Teen Employment\n", linetype = "Treatment Group") +
+  guides(shape = "none")
 ```
 
 <br>
@@ -169,7 +196,51 @@ ggplot(means, aes(x = year, y = lemp, color = factor(first.treat), group = facto
 
 ### Two time periods
 
-Since a two period design produces a single estimate for the ATT, this is really a case where graphics don't offer much beyond conveying this information through a table. 
+Since a two period design produces a single estimate for the ATT, this is really a case where graphics don't offer much beyond conveying this information through a table if our focus is on a single model. 
+
+```{r}
+#estimate TWFE
+model_2period <- feols(Y ~ period * treat | id, sim_2_period)
+
+#give the summary info
+summary(model_2period)
+```
+
+
+<br>
+
+Now it is common to have multiple models due to including covariates, looking at particular subgroups or other reasons, and in these cases there could be value to presenting the focal information about the ATT provided by the different models' DD coefficients in a visualization (with the relevant model table in appendix). 
+
+Here we arbitrarily model the odd and even ID'ed cases separately to illustrate what a multi-model graphic might look like using the DD coefficients and their SEs.
+
+```{r}
+model_2period_odds <- feols(Y ~ period * treat | id, sim_2_period %>% filter(id %% 2 == 1))
+model_2period_evens <- feols(Y ~ period * treat | id, sim_2_period %>% filter(id %% 2 == 0))
+
+coef_2period <- tidy(model_2period) %>%
+  as_tibble() %>%
+  mutate(model = "Overall")
+
+coef_2period_odds <- tidy(model_2period_odds) %>%
+  as_tibble() %>%
+  mutate(model = "Odds")
+
+coef_2period_evens <- tidy(model_2period_evens) %>%
+  as_tibble() %>%
+  mutate(model = "Evens")
+
+model_coefs <- bind_rows(coef_2period, coef_2period_odds, coef_2period_evens) %>%
+  filter(str_detect(term, "treat"))
+
+ggplot(model_coefs, aes(x = estimate, y = model, 
+                        xmin = estimate - 1.96 * std.error,
+                        xmax = estimate + 1.96 * std.error)) +
+  geom_errorbarh() +
+  geom_point() +
+  geom_vline(xintercept = 0) +
+  theme_bw() +
+  labs(x = "\nDD Coefficient", y = "Model Specification\n")
+```
 
 <br>
 
@@ -191,8 +262,6 @@ mw.attgt <- att_gt(yname = "lemp",
 
 # summarize the results
 summary(mw.attgt) 
-mw.attgt %>% ls
-
 ```
 
 <br>
@@ -202,7 +271,7 @@ There is a default plot method for the `did` package that enables you to avoid m
 ```{r}
 # plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.attgt, ylim = c(-.3,.3), type = "calendar")
+ggdid(mw.attgt, ylim = c(-.3, .3), type = "calendar")
 ```
 
 <br>
@@ -232,7 +301,7 @@ Thankfully, you can also pass `theming = FALSE` to `ggdid()` to have it produce 
 ```{r, fig.height=6, fig.width=6}
 # plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.attgt, ylim = c(-.3,.3), type = "calendar", theming = FALSE) +
+ggdid(mw.attgt, ylim = c(-.3, .3), type = "calendar", theming = FALSE) +
   scale_color_viridis_d(begin = .75, end = .25, labels = c("Pre-treatment", "Post-treatment")) +
   theme_bw() +
   theme(legend.position = "bottom") +
@@ -257,7 +326,7 @@ mw.dyn <- aggte(mw.attgt, type = "dynamic")
 summary(mw.dyn)
 
 #use the default plot method
-ggdid(mw.dyn, ylim = c(-.3,.3))
+ggdid(mw.dyn, ylim = c(-.3, .3))
 ```
 
 <br>
@@ -265,7 +334,7 @@ ggdid(mw.dyn, ylim = c(-.3,.3))
 ```{r}
 # plot the results
 # set ylim so that all plots have the same scale along y-axis
-ggdid(mw.dyn, ylim = c(-.3,.3), type = "dynamic", theming = FALSE) +
+ggdid(mw.dyn, ylim = c(-.3, .3), type = "dynamic", theming = FALSE) +
   scale_color_viridis_d(begin = .75, end = .25, labels = c("Pre-treatment", "Post-treatment")) +
   theme_bw() +
   theme(legend.position = "bottom") +
@@ -274,7 +343,15 @@ ggdid(mw.dyn, ylim = c(-.3,.3), type = "dynamic", theming = FALSE) +
 
 <br>
 
-## Hands-on: Use the `injury` data or your own data to make graphics for trends over time.
+## Hands-on: Use the `injury` data or your own data to make graphics for a DD model
+
+The following hands-on practice uses data from the following article. 
+
+> B.D. Meyer, W.K. Viscusi, and D.L. Durbin (1995), “Workers’ Compensation and Injury Duration: Evidence from a Natural Experiment,” American Economic Review 85, 322-340.
+
+Since these are data from an R library, you can view the codebook [here](https://rdrr.io/cran/wooldridge/man/injury.html).
+
+Model the data for Kentucky (`ki`) and Michigan (`mi`) separately. Make `log(durat)` the dependent variable, `afchnge` the policy change dummy variable (i.e., 1 = after policy change) and `highearn` the dummy variable for high earners (i.e., 1 = high earner).
 
 ```{r}
 injury <- read_csv("./data/injury.csv")

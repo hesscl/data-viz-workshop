@@ -1,39 +1,57 @@
 ---
-title: "index"
-author: "Chris Hess"
-date: "3/28/2022"
-output: html_document
+title: "Welcome"
 ---
 
-```{r setup, include=TRUE, message=FALSE, warning=FALSE}
-#main packages for today
-library(tidyverse)
-library(sf)
+<br>
 
-#supporting cast
+This webpage is a semi-opinionated guide to using `ggplot2` for data visualization within social science research. This site was designed as a workshop for graduate students in the social sciences, but folks interested in learning data visualization with R may generally find the code vignettes useful. 
+
+Instead of focusing on the basics of the library (which many guides already do really well--see the resources page) before diving into real-world examples, this workshop takes a somewhat different tack by using common social science use cases to motivate code vignettes that then show how to use ggplot in practice.
+
+The key vignettes linked above are focused on use cases where a graphic can be especially useful at conveying an idea to your reader. In other words, these are instances where we have a clear reason to prefer figures to tables. While these use cases are not intended to be exhaustive, they are intended to be somewhat distinct in data and focus from each other.
+
+<br>
+
+## Requirements
+
+If you want to follow along on your own computer, you'll need to have a recent version of R installed along with the a few accompanying software libraries that we'll use to jump start these vignettes. 
+
+First and foremost of these libraries is the `tidyverse` meta-library which contains `ggplot2` and other useful libraries like `dplyr` that will be referenced within the workshop material. We will also use libraries like `cobalt` within Case A about covariate balance, `fixest` within Case B about design-based methods and `sf` within Case C about spatial clustering. 
+
+```{r setup, message=FALSE}
+#all cases
+library(tidyverse)
+
+#case a
+library(cobalt)
+
+#case b
+library(fixest)
+library(did)
 library(broom)
-library(ggeffects)
+
+#case c
+library(sf)
+library(tigris)
+library(ggspatial)
 library(biscale)
+library(cowplot)
+library(ggpattern)
+
+#case d
+library(snakecase)
+library(patchwork)
 ```
 
+<br>
 
-### goals of visualization
+To get started in an RStudio session, clone the GitHub repository (which includes all of the necessary data) and follow along with the .Rmd files that correspond to the different vignettes.
 
-- show distribution
-- compare groups
-- illustrate associations
+<br>
 
+## Session info
 
-### principles of effective visualizations
+```{r session-info}
+sessionInfo()
+```
 
-- hits you in a pre-frontal sort of way 
-- does not use more ink or complexity than is required to ensure correct inference
-- has enough labeling to understand w/o context 
-
-
-### types of visualizations
-
-- ggplot + sf accomplishes 95% of what you will want, especially with extensions
-- the defaults are sensible, you can fiddle with everything and the grammar of graphics is best api
-- base is good if you want to be extra fiddly rather than just fiddly
-- I wouldn't invest time in learning lattice or grid unless you want to understand the building blocks of ggplot for building your own extensions to it
